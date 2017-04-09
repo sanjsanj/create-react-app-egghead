@@ -1,48 +1,39 @@
-import React from 'react';
+/* global document */
 
-class App extends React.Component {
+import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
+
+export default class App extends Component {
   constructor() {
     super();
-    this.state = { currentEvent: '---' };
-    this.update = this.update.bind(this);
+    this.state = { increasing: false };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({ increasing: nextProps.val > this.props.val });
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextProps.val % 5 === 0;
   }
 
   update() {
-    this.setState({
-      a: this.a.refs.input.value,
-      b: this.refs.b.value,
-    });
+    ReactDOM.render(
+      <App val={this.props.val + 1} />,
+      document.getElementById('root'),
+    );
   }
 
   render() {
+    console.log(this.state.increasing);
     return (
-      <div>
-        <Input
-          ref={component => this.a = component}
-          type="text"
-          onChange={this.update.bind(this)}
-        />
-        {this.state.a}
-
-        <hr />
-
-        <input
-          ref="b"
-          type="text"
-          onChange={this.update.bind(this)}
-        />
-        {this.state.b}
-      </div>
+      <button onClick={this.update.bind(this)}>{this.props.val}</button>
     );
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    console.log(`prevProps: ${prevProps.val}`);
   }
 }
 
-class Input extends React.Component {
-  render() {
-    return (
-      <input type="text" ref="input" />
-    );
-  }
-}
-
-export default App;
+App.defaultProps = { val: 0 };
